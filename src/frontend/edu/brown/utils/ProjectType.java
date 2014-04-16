@@ -35,6 +35,7 @@ import java.util.Map;
 
 public enum ProjectType {
 
+    BIKER("Biker", "edu.brown.benchmark.biker"),
     TPCC("TPC-C", "org.voltdb.benchmark.tpcc"),
     TPCE("TPC-E", "edu.brown.benchmark.tpce"),
     TM1("TM1", "edu.brown.benchmark.tm1"),
