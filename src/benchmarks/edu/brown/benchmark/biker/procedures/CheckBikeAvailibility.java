@@ -26,50 +26,51 @@
  *  OTHER DEALINGS IN THE SOFTWARE.                                        *
  ***************************************************************************/
 
-//
-// Checks if a dock (identified by dock_id) is reserved or
-// not
-
 package edu.brown.benchmark.biker.procedures;
 
 import org.voltdb.ProcInfo;
 import org.voltdb.SQLStmt;
 import org.voltdb.VoltProcedure;
 import org.voltdb.VoltTable;
-import org.voltdb.types.TimestampType;
+import org.voltdb.VoltType;
 
-public class CheckIfReserved extends VoltProcedure {
+import edu.brown.benchmark.biker.BikerConstants;
 
-    // Checks if the vote is for a valid contestant
-    public final SQLStmt checkIfReserved = new SQLStmt(
-        "SELECT count(*) FROM reservations WHERE dock_id = ?;"
+//import org.voltdb.types.TimestampType;
+
+//
+// Check to see that a given dock contains a bike or not
+//
+// -1  => Invalid dock_id
+//  0  => Empty Dock
+//  1  => Non-Empty Dock
+//
+
+public class CheckBikeAvailibility extends VoltProcedure {
+
+    // check that a bike exists at the specified dock_id
+    public final SQLStmt checkIfBikeIsAvailible = new SQLStmt(
+        "SELECT bike_id FROM docks WHERE dock_id = ?;"
     );
 
-    // Records a vote
-    //public final SQLStmt insertVoteStmt = new SQLStmt(
-        //"INSERT INTO votes (vote_id, phone_number, state, contestant_number, created) VALUES (?, ?, ?, ?, ?);"
-    //);
-
-    // returns 1 if reserved, 0 if not, -1 on error
-    // I know this return makes no sense, but it's a
-    // start...
     public long run(long dockId) {
 
-        // Queue up validation statements
-        voltQueueSQL(checkIfReserved, dockId);
-        VoltTable validation[] = voltExecuteSQL();
+        // Execute Bike Check Query
+        voltQueueSQL(checkIfBikeIsAvailible, dockId);
+        VoltTable results = voltExecuteSQL(true)[0];
 
-        if (validation[0].getRowCount() == 0) {
-          return -1;
+        // Make sure the dock_id is valid
+        if (results.getRowCount() == 0) {
+          return BikerConstants.NOT_A_DOCK;
         }
 
-        if ((validation[1].getRowCount() == 1) &&
-            (validation[1].asScalarLong() == 1)) {
-            return 1;
-        }
-        else {
-            return 0;
+        // Make sure dock is not empty
+        if ((results.getRowCount() == 1) &&
+            (results.fetchRow(0).getLong(0) == VoltType.NULL_BIGINT )) {
+            return BikerConstants.DOCK_EMPTY;
         }
 
+        // Dock is Non-empty
+        return BikerConstants.DOCK_FULL;
     }
 }

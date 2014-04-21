@@ -4,8 +4,8 @@
  *  Massachusetts Institute of Technology                                  *
  *  Yale University                                                        *
  *                                                                         *
- *  Original By: VoltDB Inc.											   *
- *  Ported By:  Justin A. DeBrabant (http://www.cs.brown.edu/~debrabant/)  *								   
+ *  Original By: VoltDB Inc.                                               *
+ *  Ported By:  Justin A. DeBrabant (http://www.cs.brown.edu/~debrabant/)  *
  *                                                                         *
  *                                                                         *
  *  Permission is hereby granted, free of charge, to any person obtaining  *
@@ -40,7 +40,7 @@ import org.voltdb.client.Client;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcedureCallback;
 
-//import weka.classifiers.meta.Vote;
+//import weka.classifiers.meta.CheckBikeAvailibility;
 
 import edu.brown.api.BenchmarkComponent;
 import edu.brown.hstore.Hstoreservice.Status;
@@ -61,9 +61,13 @@ public class BikerClient extends BenchmarkComponent {
     //AtomicLong acceptedVotes = new AtomicLong(0);
     //AtomicLong badContestantVotes = new AtomicLong(0);
     //AtomicLong badVoteCountVotes = new AtomicLong(0);
-    //AtomicLong failedVotes = new AtomicLong(0);
+    AtomicLong emptyDock = new AtomicLong(0);
+    AtomicLong fullDock  = new AtomicLong(0);
+    AtomicLong notDock      = new AtomicLong(0);
 
-    //final Callback callback = new Callback();
+    AtomicLong failedChecks = new AtomicLong(0);
+
+    final Callback callback = new Callback();
 
     public static void main(String args[]) {
         BenchmarkComponent.main(BikerClient.class, args, false);
@@ -77,48 +81,41 @@ public class BikerClient extends BenchmarkComponent {
 
     @Override
     public void runLoop() {
-    /*    try {
+        try {
             while (true) {
                 // synchronously call the "Vote" procedure
                 try {
                     runOnce();
                 } catch (Exception e) {
-                    failedVotes.incrementAndGet();
+                    failedChecks.incrementAndGet();
                 }
 
             } // WHILE
         } catch (Exception e) {
             // Client has no clean mechanism for terminating with the DB.
             e.printStackTrace();
-        } */
-    } 
+        }
+    }
 
     @Override
     protected boolean runOnce() throws IOException {
-        // Get the next phone call
-/*        PhoneCallGenerator.PhoneCall call = switchboard.receive();
-
         Client client = this.getClientHandle();
-        boolean response = client.callProcedure(callback,
-                                                "Vote",
-                                                call.voteId,
-                                                call.phoneNumber,
-                                                call.contestantNumber,
-                                                VoterConstants.MAX_VOTES);
-        return response; */
-        return false; // just a placehoder
+        boolean response = client.callProcedure(callback, "CheckBikeAvailibility", 919);
+        boolean response2 = client.callProcedure(callback, "CheckBikeAvailibility", 200);
+        boolean response3 = client.callProcedure(callback, "CheckBikeAvailibility", 999999);
+        return (response && response2 && response3);
     }
 
     @Override
     public String[] getTransactionDisplayNames() {
-    /*    // Return an array of transaction names
+        // Return an array of transaction names
         String procNames[] = new String[]{
-            Vote.class.getSimpleName()
+            "CheckBikeAvailibility"
         };
-        return (procNames); */
+        return (procNames);
         // no clue what this should do...
-        return new String[]{"first","second"};
     }
+
 
     private class Callback implements ProcedureCallback {
 
@@ -126,22 +123,27 @@ public class BikerClient extends BenchmarkComponent {
         public void clientCallback(ClientResponse clientResponse) {
             // Increment the BenchmarkComponent's internal counter on the
             // number of transactions that have been completed
-      /*      incrementTransactionCounter(clientResponse, 0);
+            incrementTransactionCounter(clientResponse, 0);
 
             // Keep track of state (optional)
             if (clientResponse.getStatus() == Status.OK) {
+
                 VoltTable results[] = clientResponse.getResults();
                 assert(results.length == 1);
                 long status = results[0].asScalarLong();
-                if (status == VoterConstants.VOTE_SUCCESSFUL) {
-                    acceptedVotes.incrementAndGet();
+
+                if (status == BikerConstants.DOCK_EMPTY) {
+                    emptyDock.incrementAndGet();
                 }
-                else if (status == VoterConstants.ERR_INVALID_CONTESTANT) {
-                    badContestantVotes.incrementAndGet();
+
+                else if (status == BikerConstants.DOCK_FULL) {
+                    fullDock.incrementAndGet();
                 }
-                else if (status == VoterConstants.ERR_VOTER_OVER_VOTE_LIMIT) {
-                    badVoteCountVotes.incrementAndGet();
+
+                else if (status == BikerConstants.NOT_A_DOCK) {
+                    notDock.incrementAndGet();
                 }
+
             }
             else if (clientResponse.getStatus() == Status.ABORT_UNEXPECTED) {
                 if (clientResponse.getException() != null) {
@@ -150,7 +152,7 @@ public class BikerClient extends BenchmarkComponent {
                 if (debug.val && clientResponse.getStatusString() != null) {
                     LOG.warn(clientResponse.getStatusString());
                 }
-            } */
+            }
         }
     } // END CLASS
 }

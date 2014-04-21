@@ -34,7 +34,7 @@ import org.voltdb.VoltProcedure;
 import edu.brown.benchmark.AbstractProjectBuilder;
 import edu.brown.api.BenchmarkComponent;
 
-import edu.brown.benchmark.biker.procedures.CheckIfReserved;
+import edu.brown.benchmark.biker.procedures.CheckBikeAvailibility;
 import edu.brown.benchmark.biker.procedures.Initialize;
 
 public class BikerProjectBuilder extends AbstractProjectBuilder {
@@ -45,19 +45,19 @@ public class BikerProjectBuilder extends AbstractProjectBuilder {
     // REQUIRED: Retrieved via reflection by BenchmarkController
     public static final Class<? extends BenchmarkComponent> m_loaderClass = BikerLoader.class;
 
-	// a list of procedures implemented in this benchmark
+    // a list of procedures implemented in this benchmark
     @SuppressWarnings("unchecked")
     public static final Class<? extends VoltProcedure> PROCEDURES[] = (Class<? extends VoltProcedure>[])new Class<?>[] {
-        CheckIfReserved.class, Initialize.class};
-	
-	{
-		//addTransactionFrequency(Vote.class, 100);
-	}
-	
-	// a list of tables used in this benchmark with corresponding partitioning keys
+        CheckBikeAvailibility.class, Initialize.class};
+
+    {
+        addTransactionFrequency(CheckBikeAvailibility.class, 100);
+    }
+
+    // a list of tables used in this benchmark with corresponding partitioning keys
     public static final String PARTITIONING[][] = new String[][] {
         { "stations", "station_id"},
-        { "docks", "dock_id"},
+        { "docks", "station_id"},
     };
 
     public BikerProjectBuilder() {

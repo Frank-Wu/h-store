@@ -4,8 +4,8 @@
  *  Massachusetts Institute of Technology                                  *
  *  Yale University                                                        *
  *                                                                         *
- *  Original By: VoltDB Inc.											   *
- *  Ported By:  Justin A. DeBrabant (http://www.cs.brown.edu/~debrabant/)  *								   
+ *  Original By: VoltDB Inc.                                               *
+ *  Ported By:  Justin A. DeBrabant (http://www.cs.brown.edu/~debrabant/)  *
  *                                                                         *
  *                                                                         *
  *  Permission is hereby granted, free of charge, to any person obtaining  *
@@ -52,7 +52,7 @@ public class BikerLoader extends Loader {
     @Override
     public void load() {
         //int numContestants = BikerUtil.getScaledNumContestants(this.getScaleFactor());
-        if (d) 
+        if (d)
             LOG.debug("Starting BikerLoader");
 
         try {
