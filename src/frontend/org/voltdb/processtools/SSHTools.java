@@ -201,7 +201,7 @@ public abstract class SSHTools {
         command.addAll(DEFAULT_OPTIONS);
         CollectionUtil.addAll(command, sshOptions);
         command.add((username != null ? username + "@" : "") + hostname);
-        if (remotePath != null) command.add("cd " + remotePath + ";");
+        if (remotePath != null) command.add("cd " + remotePath + "; source ~/.profile; ");
         command.addAll(remoteCommand);
 
         return command.toArray(new String[0]);

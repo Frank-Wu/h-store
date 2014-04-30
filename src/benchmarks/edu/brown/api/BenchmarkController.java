@@ -367,6 +367,7 @@ public class BenchmarkController {
     }
     
     private void initializeCatalog(CatalogContext catalogContext) {
+		System.out.println("=================initialize catalog=================");
         assert(catalogContext != null);
         this.catalogContext = catalogContext;
         int total_num_clients = m_config.clients.length * hstore_conf.client.threads_per_host;
@@ -422,6 +423,7 @@ public class BenchmarkController {
      * SETUP BENCHMARK 
      */
     public void setupBenchmark() {
+		System.out.println("======================setup benchmark===================");
         // Load the catalog that we just made
         if (debug.val) LOG.debug("Loading catalog from '" + this.jarFileName + "'");
         this.initializeCatalog(CatalogUtil.loadCatalogContextFromJar(this.jarFileName));
@@ -438,6 +440,7 @@ public class BenchmarkController {
             m_launchHosts = new HashMap<Integer, Set<Pair<String,Integer>>>();
             int site_id = HStoreConstants.FIRST_PARTITION_ID;
             for (String host : m_config.hosts) {
+				System.out.println("%%%%%%%%%%%host="+host+"%%%%%%%%%%%%%%%%%%%%");
                 if (trace.val) LOG.trace(String.format("Creating host info for %s: %s:%d",
                                                          HStoreThreadManager.formatSiteName(site_id), host, HStoreConstants.DEFAULT_PORT));
                 
@@ -538,7 +541,9 @@ public class BenchmarkController {
      * Deploy the HStoreSites on the remote nodes
      */
     public void startSites() {
+		System.out.println("===================start sites=========================");
         LOG.info(makeHeader("BENCHMARK INITIALIZE"));
+		System.out.println("here, we need to create "+m_launchHosts.size()+" hosts!");
         if (debug.val) LOG.debug("Number of hosts to start: " + m_launchHosts.size());
         int hosts_started = 0;
         
@@ -609,7 +614,9 @@ public class BenchmarkController {
             siteCommand.add("-Dsite.id=" + site_id);
 
             String exec_command[] = SSHTools.convert(m_config.remoteUser, host, m_config.remotePath, m_config.sshOptions, siteCommand);
+			System.out.println("%%%%%%%%%%%host="+host+"%%%%%%%%%%%%%%%%%%%%");
             String fullCommand = StringUtil.join(" ", exec_command);
+			System.out.println("the full command is: "+ fullCommand);
             resultsUploader.setCommandLineForHost(host, fullCommand);
             if (trace.val) LOG.trace("START " + HStoreThreadManager.formatSiteName(site_id) + ": " + fullCommand);
             sitePSM.startProcess(host_id, exec_command);
@@ -648,6 +655,7 @@ public class BenchmarkController {
      * Invoke the benchmark loader
      */
     public void startLoader() {
+		System.out.println("========================start loader=======================");
         LOG.info(makeHeader("BENCHMARK LOAD"));
         String title = String.format("Starting %s Benchmark Loader - %s / ScaleFactor %.2f",
                                      this.projectBuilder.getProjectName().toUpperCase(),
@@ -725,7 +733,9 @@ public class BenchmarkController {
 
         // RUN THE LOADER
 //        if (true || m_config.localmode) {
-        
+		System.out.println("***************all loader args***************"); 
+		System.out.println(allLoaderArgs.toString());
+		System.out.println("*********************************************");
         try {
             if (trace.val) {
                 LOG.trace("Loader Class: " + m_loaderClass);
@@ -759,6 +769,7 @@ public class BenchmarkController {
      * Invoke the benchmark clients on the remote nodes
      */
     private void startClients() {
+		System.out.println("=============================start clients====================");
         final ArrayList<String> allClientArgs = new ArrayList<String>();
         if (hstore_conf.global.sshprefix != null &&
             hstore_conf.global.sshprefix.isEmpty() == false) {
@@ -1060,6 +1071,7 @@ public class BenchmarkController {
      * RUN BENCHMARK
      */
     public void runBenchmark() throws Exception {
+		System.out.println("=========================run benchmark=====================");
         if (this.stop) return;
         LOG.info(makeHeader("BENCHMARK EXECUTE"));
         
@@ -1881,6 +1893,11 @@ public class BenchmarkController {
             // Name of a host to be used for Volt servers
             else if (parts[0].equalsIgnoreCase("HOST")) {
                 String hostnport[] = parts[1].split("\\:",2);
+				System.out.println("====================HOST=====================");
+				for(String name: hostnport){
+					System.out.println(name);
+				}
+				System.out.println("=============================================");
                 siteHosts.add(hostnport[0]);
                 
             } else if (parts[0].equalsIgnoreCase("LISTENFORDEBUGGER")) {
