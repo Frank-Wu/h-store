@@ -82,6 +82,7 @@ Table::Table(int tableAllocationTargetSize) :
     m_tempTableMemoryInBytes(NULL),
     m_refcount(0)
 {
+	printf("^^^^^^^^^^^^^^^^^tableAllocationTargetSize=%d^^^^^^^^^\n", m_tableAllocationTargetSize);
     #ifdef ANTICACHE
     m_tuplesEvicted = 0;
     m_blocksEvicted = 0;
