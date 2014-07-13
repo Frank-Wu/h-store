@@ -37,6 +37,7 @@ public class TestAntiCacheSuite extends RegressionSuite {
 
     private static final String PREFIX = "anticache";
     private static final int NOTIFY_TIMEOUT = 2000; // ms
+    private static final int NUM_VOTES = 100;
     
     /**
      * Constructor needed for JUnit. Should just pass on parameters to superclass.
@@ -105,7 +106,8 @@ public class TestAntiCacheSuite extends RegressionSuite {
         int numBlocks[] = { 1 };
         for (int partition : catalogContext.getAllPartitionIds()) {
 //            System.err.printf("Evicting data at partition %d...\n", partition);
-            Object params[] = { partition, tableNames, evictBytes, numBlocks };
+        	String children[] = null;
+            Object params[] = { partition, tableNames, children, evictBytes, numBlocks };
             boolean result = client.callProcedure(callback, procName, params);
             assertTrue(result);
         } // FOR
@@ -124,6 +126,38 @@ public class TestAntiCacheSuite extends RegressionSuite {
         assertEquals(catalogContext.numberOfPartitions, m.size());
 //        System.err.printf("Finished evicting data.");
         return (m);
+    }
+    
+    
+    private void checkEvictedAccess(String procName, Object params[], int expected) throws Exception {
+        Client client = this.getClient();
+        this.initializeDatabase(client);
+        this.loadVotes(client, NUM_VOTES);
+        int num_evicts = 5;
+        for (int i = 0; i < num_evicts; i++) {
+            this.evictData(client);
+        } // FOR
+        
+        // Now force the system to fetch the block back in
+        // long expected = 1;
+        ClientResponse cresponse = client.callProcedure(procName, params);
+        assertEquals(cresponse.toString(), Status.OK, cresponse.getStatus());
+        assertEquals(cresponse.toString(), 1, cresponse.getResults().length);
+        VoltTable result = cresponse.getResults()[0];
+        // result.advanceRow();
+        // assertEquals(cresponse.toString(), expected, result.getRowCount());
+        
+        // Our stats should now come back with one evicted access
+        cresponse = client.callProcedure(VoltSystemProcedure.procCallName(EvictedAccessHistory.class));
+        assertEquals(cresponse.toString(), Status.OK, cresponse.getStatus());
+        assertEquals(cresponse.toString(), 1, cresponse.getResults().length);
+        result = cresponse.getResults()[0];
+        // assertEquals(1, result.getRowCount());
+        System.err.println(VoltTableUtil.format(result));
+        
+        while (result.advanceRow()) {
+            assertEquals(procName, result.getString("PROCEDURE"));
+        } // WHILE        
     }
     
     // --------------------------------------------------------------------------------------------
@@ -213,41 +247,29 @@ public class TestAntiCacheSuite extends RegressionSuite {
         } // WHILE
     }
     
-//    /**
-//     * testEvictedAccessHistory
-//     */
-//    public void testEvictedAccessHistory() throws Exception {
-//        Client client = this.getClient();
-//        this.initializeDatabase(client);
-//        this.loadVotes(client, 100);
-//        int num_evicts = 5;
-//        for (int i = 0; i < num_evicts; i++) {
-//            this.evictData(client);
-//        } // FOR
-//        
-//        // Now force the system to fetch the block back in
-//        long expected = 1;
-//        String procName = "GetVote";
-//        Object params[] = { expected };
-//        ClientResponse cresponse = client.callProcedure(procName, params);
-//        assertEquals(cresponse.toString(), Status.OK, cresponse.getStatus());
-//        assertEquals(cresponse.toString(), 1, cresponse.getResults().length);
-//        assertEquals(cresponse.toString(), expected, cresponse.getResults()[0].getLong(0));
-//        
-//        // Our stats should now come back with one evicted access
-//        procName = VoltSystemProcedure.procCallName(EvictedAccessHistory.class);
-//        cresponse = client.callProcedure(procName);
-//        assertEquals(cresponse.toString(), Status.OK, cresponse.getStatus());
-//        assertEquals(cresponse.toString(), 1, cresponse.getResults().length);
-//        VoltTable result = cresponse.getResults()[0];
-//        assertEquals(1, result.getRowCount());
-//        System.err.println(VoltTableUtil.format(result));
-//        
-//        while (result.advanceRow()) {
-//            assertEquals(procName, result.getString("PROCEDURE"));
-//        } // WHILE
-//    }
+    /**
+     * testEvictedAccessSeqScan
+     */
+    public void testEvictedAccessSeqScan() throws Exception {
+        Object params[] = { };
+        this.checkEvictedAccess("GetAllVotes", params, NUM_VOTES);
+    }
     
+    /**
+     * testEvictedAccessIndexScan
+     */
+    public void testEvictedAccessIndexScan() throws Exception {
+        Object params[] = { 1 };
+        this.checkEvictedAccess("GetVote", params, 1);
+    }
+    
+    /**
+     * testEvictedAccessIndexJoin
+     */
+    public void testEvictedAccessIndexJoin() throws Exception {
+        Object params[] = { 1 };
+        this.checkEvictedAccess("GetVoteJoin", params, 1);
+    }
 
     public static Test suite() {
         VoltServerConfig config = null;
@@ -258,13 +280,24 @@ public class TestAntiCacheSuite extends RegressionSuite {
         builder.setGlobalConfParameter("site.anticache_profiling", true);
         builder.setGlobalConfParameter("site.anticache_reset", true);
         builder.setGlobalConfParameter("site.anticache_check_interval", Integer.MAX_VALUE);
+        builder.setGlobalConfParameter("site.anticache_batching", false);
 
         // build up a project builder for the TPC-C app
         VoterProjectBuilder project = new VoterProjectBuilder();
         project.addAllDefaults();
         project.markTableEvictable(VoterConstants.TABLENAME_VOTES);
+        project.markTableEvictable(VoterConstants.TABLENAME_CONTESTANTS);
         project.addStmtProcedure("GetVote",
                                  "SELECT * FROM " + VoterConstants.TABLENAME_VOTES + " WHERE vote_id = ?");
+        project.addStmtProcedure("GetAllVotes",
+                                 "SELECT * FROM " + VoterConstants.TABLENAME_VOTES);
+        project.addStmtProcedure("GetVoteJoin",
+                String.format("SELECT phone_number, contestant_number FROM %s, %s " + 
+                              " WHERE vote_id = ? " +
+                              "   AND %s.contestant_number = %s.contestant_number",
+                              VoterConstants.TABLENAME_VOTES, VoterConstants.TABLENAME_CONTESTANTS,
+                              VoterConstants.TABLENAME_VOTES, VoterConstants.TABLENAME_CONTESTANTS));
+        
         boolean success;
         
         /////////////////////////////////////////////////////////////

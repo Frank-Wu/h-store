@@ -574,7 +574,8 @@ public abstract class VoltProcedure implements Poolable {
             try {
                 // ANTI-CACHE TABLE MERGE
                 if (hstore_conf.site.anticache_enable && txnState.hasAntiCacheMergeTable()) {
-                    LOG.debug("Merging blocks for anticache table.");
+                    if (debug.val)
+                        LOG.debug("Merging blocks for anticache table.");
     
                     if (hstore_conf.site.anticache_profiling) {
                         this.hstore_site.getAntiCacheManager()
@@ -667,6 +668,7 @@ public abstract class VoltProcedure implements Poolable {
             // ConstraintFailureException
             // -------------------------------
             } else if (ex_class.equals(ConstraintFailureException.class)) {
+            	LOG.info("Found the abort!!!"+ex_class);
                 this.status = Status.ABORT_UNEXPECTED;
                 this.status_msg = "CONSTRAINT VIOLATION: " + ex.getMessage();
                 
@@ -674,6 +676,7 @@ public abstract class VoltProcedure implements Poolable {
             // ServerFaultException
             // -------------------------------
             } else if (ex_class.equals(ServerFaultException.class)) {
+            	LOG.info("Found the abort!!!"+ex_class);
                 // A server fault means that we definitely did something wrong
                 this.status = Status.ABORT_UNEXPECTED;
                 this.status_msg = "SERVER FAULT: " + ex.getMessage();
@@ -703,6 +706,7 @@ public abstract class VoltProcedure implements Poolable {
                 if (debug.val && executor.isShuttingDown() == false) {
                     LOG.warn(String.format("%s Unexpected Abort: %s", this.localTxnState, msg), ex);
                 }
+                LOG.info("Found the abort!!!"+ex);
                 this.status = Status.ABORT_UNEXPECTED;
                 this.status_msg = "UNEXPECTED ABORT: " + statusMsg;
                 
@@ -715,6 +719,7 @@ public abstract class VoltProcedure implements Poolable {
         } catch (Throwable ex) {
             if (debug.val)
                 LOG.error("Unpexpected error when executing " + this.localTxnState, ex);
+            LOG.info("Found the abort!!!"+ex);
             this.status = Status.ABORT_UNEXPECTED;
             this.status_msg = "UNEXPECTED ERROR IN " + this.localTxnState;
         } finally {
@@ -760,7 +765,7 @@ public abstract class VoltProcedure implements Poolable {
          *  that isn't serialized during messaging that is the log data for the txn
          */
         if (hstore_conf.site.aries && this.hstore_conf.site.aries_forward_only == false) {
-            if (this.status == status.OK && this.error == null) {
+            if (this.status == Status.OK && this.error == null) {
                 if (bufferLength > 0) {
                     response.setAriesLogData(arieslogData);
                 }

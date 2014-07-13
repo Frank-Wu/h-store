@@ -77,7 +77,7 @@ public class TestAntiCacheManager extends BaseTestCase {
         assertTrue(catalog_tbl.getEvictable());
         this.locators = new int[] { catalog_tbl.getRelativeIndex() };
         
-        Site catalog_site = CollectionUtil.first(CatalogUtil.getCluster(catalog).getSites());
+        Site catalog_site = CollectionUtil.first(getCatalogContext().sites);
         this.hstore_conf = HStoreConf.singleton();
         this.hstore_conf.site.status_enable = false;
         this.hstore_conf.site.anticache_enable = true;
@@ -145,13 +145,13 @@ public class TestAntiCacheManager extends BaseTestCase {
         assertTrue(adv);
           return (evictResult);
     }
-    
+
+
     // --------------------------------------------------------------------------------------------
     // TEST CASES
     // --------------------------------------------------------------------------------------------
     
     
-    /*
     @Test
     public void testStats() throws Exception {
         boolean adv;
@@ -292,7 +292,6 @@ public class TestAntiCacheManager extends BaseTestCase {
         assertNotNull(profiler);
         assertEquals(1, profiler.evictedaccess_history.size());
     }
-    */
     
     @Test
     public void testEvictTuples() throws Exception {
@@ -361,7 +360,6 @@ public class TestAntiCacheManager extends BaseTestCase {
             ee.antiCacheReadBlocks(catalog_tbl, block_ids, tuple_offsets);
         } catch (UnknownBlockAccessException ex) {
             // This is what we want!
-            assertEquals(catalog_tbl, ex.getTableId(catalog_db));
             assertEquals(block_ids[0], ex.getBlockId());
             failed = true;
             System.err.println(ex);

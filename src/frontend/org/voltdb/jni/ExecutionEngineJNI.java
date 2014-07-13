@@ -245,7 +245,8 @@ public class ExecutionEngineJNI extends ExecutionEngine {
                                               final long undoToken)
       throws EEException
     {
-        if (trace.val) LOG.trace("Executing planfragment:" + planFragmentId + ", params=" + parameterSet.toString());
+        if (trace.val)
+            LOG.trace("Executing planfragment:" + planFragmentId + ", params=" + parameterSet.toString());
         
         if (this.trackingCache != null) {
             this.trackingResetCacheEntry(txnId);
@@ -492,7 +493,9 @@ public class ExecutionEngineJNI extends ExecutionEngine {
         final long undoToken, boolean allowExport) throws EEException
     {
         byte[] serialized_table = table.getTableDataReference().array();
-        if (trace.val) LOG.trace(String.format("Passing table into EE [id=%d, bytes=%s]", tableId, serialized_table.length));
+        if (trace.val)
+            LOG.trace(String.format("Passing table into EE [id=%d, bytes=%s]",
+                      tableId, serialized_table.length));
 
         final int errorCode = nativeLoadTable(this.pointer, tableId, serialized_table,
                                               txnId, lastCommittedTxnId,
@@ -776,9 +779,12 @@ public class ExecutionEngineJNI extends ExecutionEngine {
         assert(m_anticache == false);
         
         // TODO: Switch to LOG.debug
-        LOG.info("Initializing anti-cache feature at partition " + this.executor.getPartitionId());
-        LOG.info(String.format("Partition #%d AntiCache Directory: %s",
-                 this.executor.getPartitionId(), dbDir.getAbsolutePath()));
+        if (debug.val) {
+            LOG.debug("Initializing anti-cache feature at partition " + this.executor.getPartitionId());
+            LOG.debug("****************");
+            LOG.debug(String.format("Partition #%d AntiCache Directory: %s",
+                      this.executor.getPartitionId(), dbDir.getAbsolutePath()));
+        }
         final int errorCode = nativeAntiCacheInitialize(this.pointer, dbDir.getAbsolutePath(), blockSize);
         checkErrorCode(errorCode);
         m_anticache = true;
@@ -819,6 +825,33 @@ public class ExecutionEngineJNI extends ExecutionEngine {
             throw new EEException(ERRORCODE_WRONG_SERIALIZED_BYTES);
         }
     }
+
+    @Override
+	public VoltTable antiCacheEvictBlockInBatch(Table catalog_tbl,
+			Table childTable, long block_size, int num_blocks) {
+        if (m_anticache == false) {
+            String msg = "Trying to invoke anti-caching operation but feature is not enabled";
+            throw new VoltProcedure.VoltAbortException(msg);
+        }
+        deserializer.clear();
+        
+        final int numResults = nativeAntiCacheEvictBlockInBatch(this.pointer, catalog_tbl.getRelativeIndex(), childTable.getRelativeIndex(), block_size, num_blocks);
+        if (numResults == -1) {
+            throwExceptionForError(ERRORCODE_ERROR);
+        }
+        try {
+            deserializer.readInt();//Ignore the length of the result tables
+            final VoltTable results[] = new VoltTable[numResults];
+            for (int ii = 0; ii < numResults; ii++) {
+                final VoltTable resultTable = PrivateVoltTableFactory.createUninitializedVoltTable();
+                results[ii] = (VoltTable)deserializer.readObject(resultTable, this);
+            }
+            return results[0];
+        } catch (final IOException ex) {
+            LOG.error("Failed to deserialze result table for antiCacheEvictBlock" + ex);
+            throw new EEException(ERRORCODE_WRONG_SERIALIZED_BYTES);
+        }
+	}
     
     @Override
     public void antiCacheMergeBlocks(Table catalog_tbl) {
@@ -826,6 +859,7 @@ public class ExecutionEngineJNI extends ExecutionEngine {
         final int errorCode = nativeAntiCacheMergeBlocks(this.pointer, catalog_tbl.getRelativeIndex());
         checkErrorCode(errorCode);
     }
+
     
     /*
      * MMAP STORAGE
@@ -848,10 +882,11 @@ public class ExecutionEngineJNI extends ExecutionEngine {
     
     @Override
     public void ARIESInitialize(File dbDir, File logFile) throws EEException {
-        
-        LOG.debug("Initializing ARIES feature at partition " + this.executor.getPartitionId());
-        LOG.debug(String.format("Partition #%d ARIES Directory: %s",
-                 this.executor.getPartitionId(), dbDir.getAbsolutePath()));
+        if (debug.val) {
+            LOG.debug("Initializing ARIES feature at partition " + this.executor.getPartitionId());
+            LOG.debug(String.format("Partition #%d ARIES Directory: %s",
+                      this.executor.getPartitionId(), dbDir.getAbsolutePath()));
+        }
         final int errorCode = nativeARIESInitialize(this.pointer, dbDir.getAbsolutePath(), logFile.getAbsolutePath());
         checkErrorCode(errorCode);
         m_anticache = true;
@@ -859,8 +894,8 @@ public class ExecutionEngineJNI extends ExecutionEngine {
     
     @Override
     public void doAriesRecoveryPhase(long replayPointer, long replayLogSize, long replayTxnId) {
-        LOG.info("do ARIES Recovery at partition " + this.executor.getPartitionId());
-
+        if (debug.val)
+            LOG.debug("do ARIES Recovery at partition " + this.executor.getPartitionId());
         nativeDoAriesRecoveryPhase(pointer, replayPointer, replayLogSize, replayTxnId);
     }
     
@@ -893,5 +928,5 @@ public class ExecutionEngineJNI extends ExecutionEngine {
     public long readAriesLogForReplay(long[] size) {
         return nativeReadAriesLogForReplay(pointer, size);
     }
-    
+
 }

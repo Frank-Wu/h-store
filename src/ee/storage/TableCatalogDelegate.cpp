@@ -312,8 +312,9 @@ TableCatalogDelegate::init(ExecutorContext *executorContext,
         // We'll shove the EvictedTable to the PersistentTable
         // It will be responsible for deleting it in its deconstructor
         dynamic_cast<PersistentTable*>(m_table)->setEvictedTable(evicted_table);
+        dynamic_cast<PersistentTable*>(m_table)->setBatchEvicted(catalogTable.batchEvicted());
     } else {
-        VOLT_WARN("Not creating EvictedTable for table '%s'", catalogTable.name().c_str());
+        VOLT_DEBUG("Not creating EvictedTable for table '%s'", catalogTable.name().c_str());
     }
     #endif
     

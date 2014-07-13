@@ -29,8 +29,7 @@
 
 namespace voltdb {
 
-EvictedTable::EvictedTable(ExecutorContext *ctx) : PersistentTable(ctx, false)
-{
+EvictedTable::EvictedTable(ExecutorContext *ctx) : PersistentTable(ctx, false) {
     
 }
 
@@ -61,15 +60,12 @@ const void* EvictedTable::insertEvictedTuple(TableTuple &source) {
     // evicted tuple as we iterate through the index
     m_tmpTarget1.setEvictedTrue(); 
 
-	assert(m_tmpTarget1.isEvicted()); 
-	
-	//VOLT_INFO("Inserted evicted tuple %d", m_tmpTarget1.getTupleID()); 
+    assert(m_tmpTarget1.isEvicted()); 
     
     return m_tmpTarget1.address(); 
 }
     
-void EvictedTable::deleteEvictedTuple(TableTuple source)
-{
+void EvictedTable::deleteEvictedTuple(TableTuple source) {
     if(source.address() == NULL)
         return; 
     

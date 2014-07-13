@@ -574,6 +574,11 @@ SHAREDLIB_JNIEXPORT jint JNICALL Java_org_voltdb_jni_ExecutionEngine_nativeExecu
         updateJNILogProxy(engine); //JNIEnv pointer can change between calls, must be updated
         engine->setUndoToken(undoToken);
         engine->resetReusedResultOutputBuffer();
+        
+        #ifdef ANTICACHE
+        engine->antiCacheResetEvictedTupleTracker();
+        #endif
+        
         NValueArray &params = engine->getParameterContainer();
         Pool *stringPool = engine->getStringPool();
         const int paramcnt = deserializeParameterSet(engine->getParameterBuffer(), engine->getParameterBufferCapacity(), params, engine->getStringPool());
@@ -627,6 +632,10 @@ Java_org_voltdb_jni_ExecutionEngine_nativeExecuteCustomPlanFragment (
     string cppplan = str;
     env->ReleaseStringUTFChars(plan, str);
 
+    #ifdef ANTICACHE
+    engine->antiCacheResetEvictedTupleTracker();
+    #endif
+    
     // execute
     engine->setUsedParamcnt(0);
     retval = engine->executePlanFragment(cppplan, outputDependencyId,
@@ -667,6 +676,11 @@ SHAREDLIB_JNIEXPORT jint JNICALL Java_org_voltdb_jni_ExecutionEngine_nativeExecu
     try {
         updateJNILogProxy(engine); //JNIEnv pointer can change between calls, must be updated
         engine->resetReusedResultOutputBuffer();
+        
+        #ifdef ANTICACHE
+        engine->antiCacheResetEvictedTupleTracker();
+        #endif
+        
         engine->setUndoToken(undoToken);
         static_cast<JNITopend*>(engine->getTopend())->updateJNIEnv(env);
         Pool *stringPool = engine->getStringPool();
@@ -1520,6 +1534,31 @@ SHAREDLIB_JNIEXPORT jint JNICALL Java_org_voltdb_jni_ExecutionEngine_nativeAntiC
     
     try {
         retval = engine->antiCacheEvictBlock(static_cast<int32_t>(tableId), static_cast<long>(blockSize), static_cast<int>(numBlocks));
+    } catch (FatalException e) {
+        topend->crashVoltDB(e);
+    }
+    return (retval);
+}
+
+SHAREDLIB_JNIEXPORT jint JNICALL Java_org_voltdb_jni_ExecutionEngine_nativeAntiCacheEvictBlockInBatch (
+        JNIEnv *env,
+        jobject obj,
+        jlong engine_ptr,
+        jint tableId,
+        jint childTableId,
+        jlong blockSize,
+        jint numBlocks) {
+
+    int retval = -1;
+    VOLT_DEBUG("nativeAntiCacheEvictBlockInBatch() start");
+    VoltDBEngine *engine = castToEngine(engine_ptr);
+    Topend *topend = static_cast<JNITopend*>(engine->getTopend())->updateJNIEnv(env);
+    if (engine == NULL) return (retval);
+
+    engine->resetReusedResultOutputBuffer();
+
+    try {
+        retval = engine->antiCacheEvictBlockInBatch(static_cast<int32_t>(tableId), static_cast<int32_t>(childTableId), static_cast<long>(blockSize), static_cast<int>(numBlocks));
     } catch (FatalException e) {
         topend->crashVoltDB(e);
     }
