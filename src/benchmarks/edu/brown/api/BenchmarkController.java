@@ -48,6 +48,7 @@
 
 package edu.brown.api;
 
+import java.io.PrintStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -504,7 +505,7 @@ public class BenchmarkController {
             
             // START THE SERVERS
             if (m_config.noSites == false) {
-                this.startSites();
+               this.startSites();
             }
             
         } else {
@@ -616,7 +617,12 @@ public class BenchmarkController {
             String exec_command[] = SSHTools.convert(m_config.remoteUser, host, m_config.remotePath, m_config.sshOptions, siteCommand);
 			System.out.println("%%%%%%%%%%%host="+host+"%%%%%%%%%%%%%%%%%%%%");
             String fullCommand = StringUtil.join(" ", exec_command);
-			System.out.println("the full command is: "+ fullCommand);
+			try{
+				PrintStream origin=System.out;
+				System.setOut(new PrintStream(new PrintStream(new File("output.txt"))));
+				System.out.println("the full command is: "+ fullCommand);
+				System.setOut(origin);
+			}catch(Exception ex){}
             resultsUploader.setCommandLineForHost(host, fullCommand);
             if (trace.val) LOG.trace("START " + HStoreThreadManager.formatSiteName(site_id) + ": " + fullCommand);
             sitePSM.startProcess(host_id, exec_command);
@@ -1730,6 +1736,7 @@ public class BenchmarkController {
     }
 
     public static void main(final String[] vargs) throws Exception {
+		System.out.println("hello world!");
         int hostCount = 1;
         int sitesPerHost = 2;
         int k_factor = 0;
@@ -2239,7 +2246,6 @@ public class BenchmarkController {
         } else {
             if (debug.val) LOG.debug("Skipping benchmark project compilation");
         }
-
         // EXECUTE BENCHMARK
         try {
             controller.setupBenchmark();
@@ -2278,6 +2284,5 @@ public class BenchmarkController {
                 Thread.sleep(1000);
             } // WHILE
         }
-
     }
 }

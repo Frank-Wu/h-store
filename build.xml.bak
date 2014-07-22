@@ -229,15 +229,9 @@ PRIMARY ENTRY POINTS
     depends="ee"
     description="Compile C++ JNI library."
 />
-<!--
 <target name="default"
     depends="protorpc, compile, ee"
-	description="Compile Java classes and C++ JNI library."
-	/>
--->
-<target name="default"
-    depends="compile"
-	description="Compile Java classes and C++ JNI library."
+    description="Compile Java classes and C++ JNI library."
 />
 <target name="check"
     depends="compile, voltdbipc, eecheck, junit, pythonfser"
@@ -1708,7 +1702,8 @@ TEST CASES
 
 <target name='benchmark'
     description="Deploy a cluster and run a benchmark">
-	<echo message="${benchmark.conf}"/>
+	<echo message="hello world"/>
+    <!-- Benchmarks Configuration File -->
     <condition property="benchmark.conf" value="${benchmark.dir}/${project}.properties">
         <not>
             <isset property="benchmark.conf"/>
@@ -1716,7 +1711,7 @@ TEST CASES
     </condition>
     <property file="${benchmark.conf}" prefix="benchmark" />
     <fail message="Invalid benchmark project '${project}'" unless="benchmark.builder" />
-	<echo message="${benchmark.conf}"/>
+
     <java fork="true" failonerror="true"
         classname="edu.brown.api.BenchmarkController">
         <classpath refid='project.classpath' />
@@ -1751,6 +1746,7 @@ TEST CASES
         <arg value="markov.recompute_end=${markov.recompute_end}" />
         <arg value="markov.recompute_warmup=${markov.recompute_warmup}" />
 
+        <!-- Execution Options -->
         <arg value="TRACE=${trace}" />
 
         <arg value="DUMPDATABASE=${client.dump_database}" />
@@ -1758,16 +1754,19 @@ TEST CASES
 
         &common;
 
+        <!-- Benchmark Parameters -->
         <arg value="benchmark.conf=${benchmark.conf}" />
         <arg value="benchmark.builder=${benchmark.builder}" />
         <arg value="benchmark.initial_polling_delay=${benchmark.initial_polling_delay}" />
         <arg value="benchmark.datadir=${benchmark.datadir}"/>
     	
+        <!-- TPC-E Parameters -->
     	<arg value="benchmark.tpce_loader_files=${benchmark.tpce_loader_files}"/>
         <arg value="benchmark.tpce_total_customers=${benchmark.tpce_total_customers}"/>
         <arg value="benchmark.tpce_scale_factor=${benchmark.tpce_scale_factor}"/>
         <arg value="benchmark.tpce_initial_days=${benchmark.tpce_initial_days}"/>
 
+        <!-- These are currently ignored (I think...) -->
         <arg value="HOST=${manualhost1}" />
         <arg value="HOST=${host1}" />
         <arg value="LISTENFORDEBUGGER=${debug}" />
@@ -1787,6 +1786,8 @@ TEST CASES
         <arg value="NOSHUTDOWN=${noshutdown}" />
         <arg value="KILLONZERO=${killonzero}" />
 
+        <!-- Actual number of connections opened to cluster will be:
+            NUMCONNECTIONS * CLIENTCOUNT * PROCESSESPERCLIENT * HOSTCOUNT -->
         <arg value="NUMCONNECTIONS=${numconnections}" />
         <arg value="STATSDATABASETAG=${statsDatabaseTag}" />
         <arg value="STATSDATABASEURL=${statsDatabaseURL}" />
@@ -1794,8 +1795,10 @@ TEST CASES
         <arg value="STATSDATABASEPASS=${statsDatabasePass}" />
         <arg value="STATSDATABASEJDBC=${statsDatabaseJDBC}" />
 
+        <!-- measureoverhead parameters -->
         <arg value="transaction=${transaction}"/>
 
+        <!-- miscellaneous reporting parameters -->
         <arg value="OS=${os}" />
 	</java>
 </target>

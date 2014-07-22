@@ -263,7 +263,10 @@ public abstract class HStore {
         // ----------------------------------------------------------------------------
         if (debug.val)
             LOG.debug("Instantiating HStoreSite network connections for " + hstore_site.getSiteName());
+
+		System.out.println("Instantiating HStoreSite network connections for " + hstore_site.getSiteName());
         hstore_site.run();
+		System.out.println("run finished...");
     }
     
     public static String getAssertWarning() {
