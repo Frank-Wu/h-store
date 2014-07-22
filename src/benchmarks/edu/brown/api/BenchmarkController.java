@@ -619,7 +619,7 @@ public class BenchmarkController {
             String fullCommand = StringUtil.join(" ", exec_command);
 			try{
 				PrintStream origin=System.out;
-				System.setOut(new PrintStream(new PrintStream(new File("output.txt"))));
+				System.setOut(new PrintStream(new File("output.txt")));
 				System.out.println("the full command is: "+ fullCommand);
 				System.setOut(origin);
 			}catch(Exception ex){}
@@ -2249,7 +2249,7 @@ public class BenchmarkController {
         // EXECUTE BENCHMARK
         try {
             controller.setupBenchmark();
-            if (config.noExecute == false) controller.runBenchmark();
+           // if (config.noExecute == false) controller.runBenchmark();
         } catch (Throwable ex) {
             LOG.fatal("Failed to complete benchmark", ex);
             failed = true;
