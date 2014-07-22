@@ -229,16 +229,16 @@ PRIMARY ENTRY POINTS
     depends="ee"
     description="Compile C++ JNI library."
 />
-<!--
 <target name="default"
     depends="protorpc, compile, ee"
 	description="Compile Java classes and C++ JNI library."
 	/>
--->
+<!--
 <target name="default"
     depends="compile"
 	description="Compile Java classes and C++ JNI library."
 />
+-->
 <target name="check"
     depends="compile, voltdbipc, eecheck, junit, pythonfser"
     description="Run Java and C++ JNI testcases and test plan fragments."

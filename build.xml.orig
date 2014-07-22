@@ -1702,7 +1702,7 @@ TEST CASES
 
 <target name='benchmark'
     description="Deploy a cluster and run a benchmark">
-	<echo message="hello world"/>
+
     <!-- Benchmarks Configuration File -->
     <condition property="benchmark.conf" value="${benchmark.dir}/${project}.properties">
         <not>
@@ -1800,7 +1800,7 @@ TEST CASES
 
         <!-- miscellaneous reporting parameters -->
         <arg value="OS=${os}" />
-	</java>
+    </java>
 </target>
 
 <target name='proccallmicrobench' depends='ee, compile'
