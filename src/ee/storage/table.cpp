@@ -85,7 +85,6 @@ Table::Table(int tableAllocationTargetSize) :
     m_refcount(0),
     m_enableMMAP(false)
 {
-	printf("^^^^^^^^^^^^^^^^^tableAllocationTargetSize=%d^^^^^^^^^\n", m_tableAllocationTargetSize);
     #ifdef ANTICACHE
     m_tuplesEvicted = 0;
     m_blocksEvicted = 0;

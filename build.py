@@ -318,55 +318,59 @@ CTX.THIRD_PARTY_INPUT['json_spirit'] = """
 ###############################################################################
 
 # input format similar to source, but the executable name is listed
-CTX.TESTS['.'] = """
- harness_test
-"""
+#CTX.TESTS['.'] = """
+# harness_test
+#"""
 
-CTX.TESTS['catalog'] = """
- catalog_test
-"""
+#CTX.TESTS['catalog'] = """
+# catalog_test
+#"""
 
-CTX.TESTS['logging'] = """
- logging_test
-"""
+#CTX.TESTS['logging'] = """
+# logging_test
+#"""
 
-CTX.TESTS['common'] = """
- debuglog_test
- serializeio_test
- undolog_test
- valuearray_test
- nvalue_test
- tupleschema_test
- tabletuple_test
-"""
+#CTX.TESTS['common'] = """
+# debuglog_test
+# serializeio_test
+# undolog_test
+# valuearray_test
+# nvalue_test
+# tupleschema_test
+# tabletuple_test
+#"""
 
-CTX.TESTS['execution'] = """
- engine_test
-"""
+#CTX.TESTS['execution'] = """
+# engine_test
+#"""
 
-CTX.TESTS['expressions'] = """
- expression_test
-"""
+#CTX.TESTS['expressions'] = """
+# expression_test
+#"""
 
-CTX.TESTS['indexes'] = """
- index_key_test
- index_multikey_test
- index_scripted_test
- index_test
-"""
+#CTX.TESTS['indexes'] = """
+# index_key_test
+# index_multikey_test
+# index_scripted_test
+# index_test
+#"""
 
-CTX.TESTS['storage'] = """
- CopyOnWriteTest
- constraint_test
- filter_test
- mmap_persistent_table_test
- persistent_table_log_test
- serialize_test
- StreamedTable_test
- table_and_indexes_test
- table_test
- tabletuple_export_test
- TupleStreamWrapper_test
+#CTX.TESTS['storage'] = """
+# CopyOnWriteTest
+# constraint_test
+# filter_test
+# mmap_persistent_table_test
+# persistent_table_log_test
+# serialize_test
+# StreamedTable_test
+# table_and_indexes_test
+# table_test
+# tabletuple_export_test
+# TupleStreamWrapper_test
+#"""
+
+CTX.TESTS['storage']="""
+table_test1
 """
 
 # these are incomplete and out of date. need to be replaced
@@ -417,12 +421,12 @@ if CTX.ANTICACHE_BUILD:
         EvictionIterator.cpp
         EvictedTable.cpp
     """
-    
-    CTX.TESTS['anticache'] = """
-        anticachedb_test
-        berkeleydb_test
-        anticache_eviction_manager_test
-    """
+
+#    CTX.TESTS['anticache'] = """
+#        anticachedb_test
+#        berkeleydb_test
+#        anticache_eviction_manager_test
+#"""
 
 ###############################################################################
 # BUILD THE MAKEFILE
