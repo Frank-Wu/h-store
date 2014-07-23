@@ -204,19 +204,22 @@ def buildMakefile(CTX):
     os.system("mkdir -p %s" % (OUTPUT_PREFIX + "/prod"))
 
     input_paths = []
-    for dir in CTX.INPUT.keys():
-        input = CTX.INPUT[dir].split()
-        input_paths += [INPUT_PREFIX + "/" + dir + "/" + x for x in input]
+    input_paths += [INPUT_PREFIX + "/" + "storage" + "/" + "table.cpp"]
+#    for dir in CTX.INPUT.keys():
+#        input = CTX.INPUT[dir].split()
+#        input_paths += [INPUT_PREFIX + "/" + dir + "/" + x for x in input]
+    print(input_paths)
 
     third_party_input_paths = []
-    for dir in CTX.THIRD_PARTY_INPUT.keys():
-        input = CTX.THIRD_PARTY_INPUT[dir].split()
-        third_party_input_paths += [THIRD_PARTY_INPUT_PREFIX + "/" + dir + "/" + x for x in input]
+#    for dir in CTX.THIRD_PARTY_INPUT.keys():
+#        input = CTX.THIRD_PARTY_INPUT[dir].split()
+#        third_party_input_paths += [THIRD_PARTY_INPUT_PREFIX + "/" + dir + "/" + x for x in input]
 
     tests = []
     for dir in CTX.TESTS.keys():
         input = CTX.TESTS[dir].split()
         tests += [TEST_PREFIX + "/" + dir + "/" + x for x in input]
+    print(tests)
 
     makefile = file(OUTPUT_PREFIX + "/makefile", 'w')
     makefile.write("CC = gcc\n")
