@@ -1,5 +1,6 @@
 package edu.brown.hstore;
 
+import java.util.Random;
 import org.voltdb.VoltTable;
 
 public abstract class HStoreConstants {
@@ -34,9 +35,9 @@ public abstract class HStoreConstants {
      */
     public static final int DEFAULT_PORT;
     static{
-        Random rand=new Random();
-        DEFAULT_PORT=rand.nextInt(20000)+10000;
-    }
+       Random rand=new Random();
+       DEFAULT_PORT=rand.nextInt(20000)+10000;
+   }
     
     public static final int MESSENGER_PORT_OFFSET = 10000;
     
