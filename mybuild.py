@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os, sys, commands, string, glob
-from buildtools import *
+from mybuildtools import *
 
 # usage:
 # The following all work as you might expect:
@@ -178,196 +178,22 @@ if CTX.PLATFORM == "Linux":
 # separated source files (cpp only for now).  Preferred ordering is
 # one file per line, indented one space, in alphabetical order.
 
-CTX.INPUT[''] = """
- voltdbjni.cpp
-"""
-
-# 2012-03-14
-# Automatically grab all of our catalog files
-catalog_files = [ ]
-for f in glob.glob(os.path.join(CTX.INPUT_PREFIX, 'catalog', '*.cpp')):
-    catalog_files.append(os.path.basename(f))
-CTX.INPUT['catalog'] = "\n".join(sorted(catalog_files))
-
-CTX.INPUT['common'] = """
- SegvException.cpp
- SerializableEEException.cpp
- SQLException.cpp
- tabletuple.cpp
- TupleSchema.cpp
- types.cpp
- UndoLog.cpp
- NValue.cpp
- MMAPMemoryManager.cpp
- RecoveryProtoMessage.cpp
- RecoveryProtoMessageBuilder.cpp
- DefaultTupleSerializer.cpp
- StringRef.cpp
-"""
-
-CTX.INPUT['execution'] = """
- JNITopend.cpp
- VoltDBEngine.cpp
-"""
-
-CTX.INPUT['executors'] = """
- abstractexecutor.cpp
- deleteexecutor.cpp
- distinctexecutor.cpp
- executorutil.cpp
- indexscanexecutor.cpp
- insertexecutor.cpp
- limitexecutor.cpp
- materializeexecutor.cpp
- nestloopexecutor.cpp
- nestloopindexexecutor.cpp
- orderbyexecutor.cpp
- projectionexecutor.cpp
- receiveexecutor.cpp
- sendexecutor.cpp
- seqscanexecutor.cpp
- unionexecutor.cpp
- updateexecutor.cpp
-"""
-
-CTX.INPUT['expressions'] = """
- abstractexpression.cpp
- expressionutil.cpp
- tupleaddressexpression.cpp
-"""
-
-CTX.INPUT['plannodes'] = """
- abstractjoinnode.cpp
- abstractoperationnode.cpp
- abstractplannode.cpp
- abstractscannode.cpp
- aggregatenode.cpp
- deletenode.cpp
- distinctnode.cpp
- indexscannode.cpp
- insertnode.cpp
- limitnode.cpp
- materializenode.cpp
- nestloopindexnode.cpp
- nestloopnode.cpp
- orderbynode.cpp
- PlanColumn.cpp
- plannodefragment.cpp
- plannodeutil.cpp
- projectionnode.cpp
- receivenode.cpp
- sendnode.cpp
- seqscannode.cpp
- unionnode.cpp
- updatenode.cpp
-"""
-
-CTX.INPUT['indexes'] = """
- arrayuniqueindex.cpp
- tableindex.cpp
- tableindexfactory.cpp
- IndexStats.cpp
-"""
-
 CTX.INPUT['storage'] = """
- constraintutil.cpp
- CopyOnWriteContext.cpp
- CopyOnWriteIterator.cpp
- ConstraintFailureException.cpp
- MaterializedViewMetadata.cpp
- mmap_persistenttable.cpp
- persistenttable.cpp
- PersistentTableStats.cpp
- PersistentTableUndoDeleteAction.cpp
- PersistentTableUndoInsertAction.cpp
- PersistentTableUndoUpdateAction.cpp
- StreamedTableStats.cpp
- streamedtable.cpp
+ hypervisor.cpp
  table.cpp
- TableCatalogDelegate.cpp
- tablefactory.cpp
- TableStats.cpp
- tableutil.cpp
- temptable.cpp
- TupleStreamWrapper.cpp
- RecoveryContext.cpp
- ReadWriteTracker.cpp
 """
 
-CTX.INPUT['stats'] = """
- StatsAgent.cpp
- StatsSource.cpp
-"""
-
-CTX.INPUT['logging'] = """
- JNILogProxy.cpp
- LogManager.cpp
- AriesLogProxy.cpp
- Logrecord.cpp
-"""
  
 # specify the third party input
 
-CTX.THIRD_PARTY_INPUT['json_spirit'] = """
- json_spirit_reader.cpp
- json_spirit_value.cpp
-"""
+#CTX.THIRD_PARTY_INPUT['json_spirit'] = """
+# json_spirit_reader.cpp
+# json_spirit_value.cpp
+#"""
 
 ###############################################################################
 # SPECIFY THE TESTS
 ###############################################################################
-
-# input format similar to source, but the executable name is listed
-#CTX.TESTS['.'] = """
-# harness_test
-#"""
-
-#CTX.TESTS['catalog'] = """
-# catalog_test
-#"""
-
-#CTX.TESTS['logging'] = """
-# logging_test
-#"""
-
-#CTX.TESTS['common'] = """
-# debuglog_test
-# serializeio_test
-# undolog_test
-# valuearray_test
-# nvalue_test
-# tupleschema_test
-# tabletuple_test
-#"""
-
-#CTX.TESTS['execution'] = """
-# engine_test
-#"""
-
-#CTX.TESTS['expressions'] = """
-# expression_test
-#"""
-
-#CTX.TESTS['indexes'] = """
-# index_key_test
-# index_multikey_test
-# index_scripted_test
-# index_test
-#"""
-
-#CTX.TESTS['storage'] = """
-# CopyOnWriteTest
-# constraint_test
-# filter_test
-# mmap_persistent_table_test
-# persistent_table_log_test
-# serialize_test
-# StreamedTable_test
-# table_and_indexes_test
-# table_test
-# tabletuple_export_test
-# TupleStreamWrapper_test
-#"""
 
 CTX.TESTS['storage']="""
 hypertable_test
@@ -413,20 +239,6 @@ if CTX.ANTICACHE_BUILD:
         "berkeleydb/libdb_cxx.a", # BerkeleyDB C++ Library
     ])
     
-    CTX.INPUT['anticache'] = """
-        EvictedTupleAccessException.cpp
-        UnknownBlockAccessException.cpp
-        AntiCacheDB.cpp
-        AntiCacheEvictionManager.cpp
-        EvictionIterator.cpp
-        EvictedTable.cpp
-    """
-
-#    CTX.TESTS['anticache'] = """
-#        anticachedb_test
-#        berkeleydb_test
-#        anticache_eviction_manager_test
-#"""
 
 ###############################################################################
 # BUILD THE MAKEFILE

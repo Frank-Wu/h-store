@@ -65,6 +65,7 @@
 #include "storage/tablefactory.h"
 #include "storage/tableiterator.h"
 #include "storage/tableutil.h"
+#include "storage/hypervisor.h"
 
 using std::string;
 using std::vector;
@@ -89,6 +90,8 @@ bool COLUMN_ALLOW_NULLS[NUM_OF_COLUMNS]         = { true, true, true, true, true
 class TableTest : public Test {
     public:
         TableTest() : table(NULL), temp_table(NULL), persistent_table(NULL) {
+			Hypervisor hyper;
+			hyper.printHello();
             srand(0);
             init(false); // default is temp_table. call init(true) to make it transactional
         }

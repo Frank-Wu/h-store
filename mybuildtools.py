@@ -204,10 +204,9 @@ def buildMakefile(CTX):
     os.system("mkdir -p %s" % (OUTPUT_PREFIX + "/prod"))
 
     input_paths = []
-    input_paths += [INPUT_PREFIX + "/" + "storage" + "/" + "table.cpp"]
-#    for dir in CTX.INPUT.keys():
-#        input = CTX.INPUT[dir].split()
-#        input_paths += [INPUT_PREFIX + "/" + dir + "/" + x for x in input]
+    for dir in CTX.INPUT.keys():
+        input = CTX.INPUT[dir].split()
+        input_paths += [INPUT_PREFIX + "/" + dir + "/" + x for x in input]
     print(input_paths)
 
     third_party_input_paths = []
@@ -369,11 +368,11 @@ def buildMakefile(CTX):
     return True
 
 def buildIPC(CTX):
-    retval = os.system("make --directory=%s prod/voltdbipc -j4" % (CTX.OUTPUT_PREFIX))
+    retval = os.system("make --directory=%s prod/voltdbipc -j8" % (CTX.OUTPUT_PREFIX))
     return retval
 
 def buildTests(CTX):
-    retval = os.system("make --directory=%s test -j4" % (CTX.OUTPUT_PREFIX))
+    retval = os.system("make --directory=%s test -j8" % (CTX.OUTPUT_PREFIX))
     if retval != 0:
         return -1
     return retval
