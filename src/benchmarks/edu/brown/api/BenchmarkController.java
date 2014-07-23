@@ -48,6 +48,7 @@
 
 package edu.brown.api;
 
+import java.util.Scanner;
 import java.io.PrintStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -479,6 +480,7 @@ public class BenchmarkController {
             // HStoreSite
             // IMPORTANT: Don't try to kill things if we're going to profile... for obvious reasons... duh!
             if (m_config.profileSiteIds.isEmpty() && m_config.noSites == false) {
+				System.out.println("profile site is empty!");
                 for (String host : unique_hosts) {
                     KillStragglers ks = new KillStragglers(m_config.remoteUser, host, m_config.remotePath, m_config.sshOptions).enableKillAll();
                     threads.add(new Thread(ks));
@@ -491,8 +493,10 @@ public class BenchmarkController {
                 threads.add(new Thread(ks));
                 Runtime.getRuntime().addShutdownHook(new Thread(ks));
             } // FOR
-
-            
+			//******************************important************************
+			//H-Store will try to kill all hstore processes before getting started.
+			//Comment this segment out and avoid such process killing. --Yingjun
+			/* 
             if (debug.val) LOG.debug("Killing stragglers on " + threads.size() + " hosts");
             try {
                 ThreadUtil.runNewPool(threads, Math.min(25, threads.size())); 
@@ -502,7 +506,7 @@ public class BenchmarkController {
                 LOG.fatal("Couldn't run remote kill operation.", e);
                 System.exit(-1);
             }
-            
+            */
             // START THE SERVERS
             if (m_config.noSites == false) {
                this.startSites();
@@ -620,7 +624,9 @@ public class BenchmarkController {
 			try{
 				PrintStream origin=System.out;
 				System.setOut(new PrintStream(new File("output.txt")));
-				System.out.println("the full command is: "+ fullCommand);
+				for(String str : exec_command){
+					System.out.println(str);
+				}
 				System.setOut(origin);
 			}catch(Exception ex){}
             resultsUploader.setCommandLineForHost(host, fullCommand);
@@ -628,8 +634,8 @@ public class BenchmarkController {
             sitePSM.startProcess(host_id, exec_command);
             hosts_started++;
         } // FOR
-
-        // WAIT FOR SERVERS TO BE READY
+        // WAIT FOR SERVERS TO BE READY=
+		
         int waiting = hosts_started;
         if (waiting > 0) {
             LOG.info(String.format("Waiting for %d HStoreSite%s with %d partition%s to finish initialization",
@@ -2249,7 +2255,7 @@ public class BenchmarkController {
         // EXECUTE BENCHMARK
         try {
             controller.setupBenchmark();
-           // if (config.noExecute == false) controller.runBenchmark();
+            if (config.noExecute == false) controller.runBenchmark();
         } catch (Throwable ex) {
             LOG.fatal("Failed to complete benchmark", ex);
             failed = true;
