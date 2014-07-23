@@ -48,7 +48,7 @@
 
 package edu.brown.api;
 
-import java.util.Scanner;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -623,10 +623,11 @@ public class BenchmarkController {
             String fullCommand = StringUtil.join(" ", exec_command);
 			try{
 				PrintStream origin=System.out;
-				System.setOut(new PrintStream(new File("output.txt")));
+				System.setOut(new PrintStream(new FileOutputStream("output.txt", true)));
 				for(String str : exec_command){
 					System.out.println(str);
 				}
+				System.out.println("\n===================\n");
 				System.setOut(origin);
 			}catch(Exception ex){}
             resultsUploader.setCommandLineForHost(host, fullCommand);
