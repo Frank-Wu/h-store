@@ -87,15 +87,13 @@ int32_t COLUMN_SIZES[NUM_OF_COLUMNS]                = {
                            NValue::getTupleStorageSize(voltdb::VALUE_TYPE_BIGINT) };
 bool COLUMN_ALLOW_NULLS[NUM_OF_COLUMNS]         = { true, true, true, true, true };
 
-class TableTest : public Test {
+class HyperTableTest : public Test {
     public:
-        TableTest() : table(NULL), temp_table(NULL), persistent_table(NULL) {
-			Hypervisor hyper;
-			hyper.printHello();
+        HyperTableTest() : table(NULL), temp_table(NULL), persistent_table(NULL) {
             srand(0);
             init(false); // default is temp_table. call init(true) to make it transactional
         }
-        ~TableTest() {
+        ~HyperTableTest() {
             delete table;
         }
 
@@ -118,9 +116,11 @@ class TableTest : public Test {
             }
             voltdb::TupleSchema *schema = voltdb::TupleSchema::createTupleSchema(columnTypes, columnLengths, columnAllowNull, true);
             if (xact) {
+                std::cout<<"this is persist table"<<std::endl;
                 persistent_table = voltdb::TableFactory::getPersistentTable(database_id, NULL, "test_table", schema, columnNames, -1, false, false);
                 table = persistent_table;
             } else {
+                std::cout<<"this is temp table"<<std::endl;
                 temp_table = voltdb::TableFactory::getTempTable(database_id, "test_table", schema, columnNames, NULL);
                 table = temp_table;
             }
@@ -135,7 +135,7 @@ class TableTest : public Test {
         voltdb::Table* persistent_table;
 };
 
-TEST_F(TableTest, ValueTypes) {
+TEST_F(HyperTableTest, ValueTypes) {
     //
     // Make sure that our table has the right types and that when
     // we pull out values from a tuple that it has the right type too
@@ -150,7 +150,7 @@ TEST_F(TableTest, ValueTypes) {
     }
 }
 
-TEST_F(TableTest, TupleInsert) {
+TEST_F(HyperTableTest, TupleInsert) {
     //
     // All of the values have already been inserted, we just
     // need to make sure that the data makes sense
@@ -186,7 +186,7 @@ TEST_F(TableTest, TupleInsert) {
     }
 }
 
-TEST_F(TableTest, TupleUpdate) {
+TEST_F(HyperTableTest, TupleUpdate) {
     //
     // Loop through and randomly update values
     // We will keep track of multiple columns to make sure our updates
