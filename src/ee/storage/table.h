@@ -57,6 +57,7 @@
 #include "common/Pool.hpp"
 #include "common/tabletuple.h"
 #include "common/MMAPMemoryManager.h"
+#include "hypervisor.h"
 
 namespace voltdb {
 
@@ -497,7 +498,9 @@ inline void Table::allocateNextBlock() {
 #else
     int bytes = m_tableAllocationTargetSize;
 #endif
+	std::cout<<"allocate next block size="<<bytes<<std::endl;
     char *memory = (char*)(new char[bytes]);
+	//char *memory = (char*) Hypervisor::myAlloc(bytes);
     m_data.push_back(memory);
 #ifdef MEMCHECK_NOFREELIST
     assert(m_allocatedTuplePointers.insert(memory).second);

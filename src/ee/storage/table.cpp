@@ -220,6 +220,7 @@ void Table::initializeWithColumns(TupleSchema *schema, const std::string* column
     // initialize the temp tuple
     char *m_tempTupleMemory = m_tempTuple.m_data;
     delete[] reinterpret_cast<char*>(m_tempTupleMemory);
+	std::cout<<"new size="<<m_schema->tupleLength() + TUPLE_HEADER_SIZE <<std::endl;
     m_tempTupleMemory = new char[m_schema->tupleLength() + TUPLE_HEADER_SIZE];
     m_tempTuple = TableTuple(m_tempTupleMemory, m_schema);
     ::memset(m_tempTupleMemory, 0, m_tempTuple.tupleLength());
