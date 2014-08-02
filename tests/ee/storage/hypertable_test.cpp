@@ -92,6 +92,7 @@ class HyperTableTest : public Test {
         HyperTableTest() : table(NULL), temp_table(NULL), persistent_table(NULL) {
             srand(0);
             init(false); // default is temp_table. call init(true) to make it transactional
+			std::cout<<"constructor finished!"<<std::endl;
         }
         ~HyperTableTest() {
             delete table;
@@ -124,8 +125,9 @@ class HyperTableTest : public Test {
                 temp_table = voltdb::TableFactory::getTempTable(database_id, "test_table", schema, columnNames, NULL);
                 table = temp_table;
             }
+			std::cout<<"here!"<<std::endl;
             assert(tableutil::addRandomTuples(this->table, NUM_OF_TUPLES));
-
+			std::cout<<"there!"<<std::endl;
             // clean up
             delete[] columnNames;
         }
@@ -136,6 +138,7 @@ class HyperTableTest : public Test {
 };
 
 TEST_F(HyperTableTest, ValueTypes) {
+	std::cout<<"test begin!"<<std::endl;
     //
     // Make sure that our table has the right types and that when
     // we pull out values from a tuple that it has the right type too
@@ -148,6 +151,7 @@ TEST_F(HyperTableTest, ValueTypes) {
             EXPECT_EQ(COLUMN_TYPES[ctr], tuple.getType(ctr));
         }
     }
+	std::cout<<"test finished!"<<std::endl;
 }
 
 TEST_F(HyperTableTest, TupleInsert) {
