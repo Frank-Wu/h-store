@@ -1,5 +1,6 @@
 package edu.brown.hstore;
 
+import java.util.Random;
 import org.voltdb.VoltTable;
 
 public abstract class HStoreConstants {
@@ -32,7 +33,11 @@ public abstract class HStoreConstants {
     /**
      * The default port number for H-Store cluster instances.
      */
-    public static final int DEFAULT_PORT = 21212;
+    public static final int DEFAULT_PORT;
+    static{
+       Random rand=new Random();
+       DEFAULT_PORT=rand.nextInt(20000)+10000;
+   }
     
     public static final int MESSENGER_PORT_OFFSET = 10000;
     

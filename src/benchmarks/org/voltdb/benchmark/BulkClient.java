@@ -51,6 +51,7 @@ import org.voltdb.messaging.FastDeserializer;
 import org.voltdb.client.NullCallback;
 import org.voltdb.client.ProcedureCallback;
 import org.voltdb.messaging.FastSerializer;
+import edu.brown.hstore.HStoreConstants;
 import java.lang.reflect.Constructor;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -1209,7 +1210,7 @@ public abstract class BulkClient {
                 public void run() {
                     try {
                         InetSocketAddress addr = new InetSocketAddress(
-                                hostname, 21212);
+                                hostname, HStoreConstants.DEFAULT_PORT);
                         SocketChannel aChannel = SocketChannel.open(addr);
                         assert (aChannel.isConnected());
                         if (!aChannel.isConnected()) {

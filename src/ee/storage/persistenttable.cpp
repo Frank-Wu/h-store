@@ -102,7 +102,7 @@ PersistentTable::PersistentTable(ExecutorContext *ctx, bool exportEnabled) :
     m_tsSeqNo(0), stats_(this), m_exportEnabled(exportEnabled),
     m_COWContext(NULL)
 {
-
+	printf("@@@@@@@@@create persistent table@@@@@@@@@@@\n");
     #ifdef ANTICACHE
     m_evictedTable = NULL;
     m_unevictedTuples = NULL; 

@@ -57,6 +57,7 @@
 #include "common/Pool.hpp"
 #include "common/tabletuple.h"
 #include "common/MMAPMemoryManager.h"
+#include "hypervisor.h"
 
 namespace voltdb {
 
@@ -393,6 +394,7 @@ protected:
 
     char *m_columnHeaderData;
     int32_t m_columnHeaderSize;
+	int allocCount;
 
 #if ANTICACHE
     // ACTIVE
@@ -497,8 +499,16 @@ inline void Table::allocateNextBlock() {
 #else
     int bytes = m_tableAllocationTargetSize;
 #endif
-    char *memory = (char*)(new char[bytes]);
-    m_data.push_back(memory);
+	std::cout<<"allocate next block size="<<bytes<<std::endl;
+    //char *memory = (char*)(new char[bytes]);
+	//char *memory = (char*) Hypervisor::myAlloc(bytes);
+    //char *memory = (char*)mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
+	std::cout<<"offset="<<bytes*m_data.size()<<std::endl;
+	int fd = shm_open("foo", O_RDWR|O_CREAT, (mode_t)0600);
+	ftruncate(fd, 1000000000);
+	char *memory = (char*)mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, bytes*m_data.size());
+	shm_unlink("foo");
+	m_data.push_back(memory);
 #ifdef MEMCHECK_NOFREELIST
     assert(m_allocatedTuplePointers.insert(memory).second);
     m_deletedTuplePointers.erase(memory);

@@ -25,6 +25,8 @@ package edu.brown.api;
 
 import java.util.Arrays;
 
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import org.apache.log4j.Logger;
 import org.voltdb.processtools.SSHTools;
 import org.voltdb.processtools.ShellTools;
@@ -97,6 +99,15 @@ public class KillStragglers implements Runnable {
         
         String cmd[] = SSHTools.convert(m_username, m_hostname, m_remotePath, m_sshOptions, kill_cmd); 
         LOG.debug("KILL PUSSY CAT KILL: " + Arrays.toString(cmd));
+		try{
+			PrintStream origin=System.out;
+			System.setOut(new PrintStream(new FileOutputStream("killer.txt", true)));
+			for(String str : cmd){
+				System.out.println(str);
+			}
+			System.out.println("\n===================\n");
+			System.setOut(origin);
+		}catch(Exception ex){}
         ShellTools.cmdToStdOut(cmd);
         LOG.debug("Finished killing at " + m_hostname);
     }
