@@ -79,7 +79,7 @@ CTX.OUTPUT_PREFIX += "/"
 # these are the base compile options that get added to every compile step
 # this does not include header/lib search paths or specific flags for
 #  specific targets
-CTX.CPPFLAGS = """-Wall -Wextra -Werror -Woverloaded-virtual
+CTX.CPPFLAGS = """-std=c++11 -Wall -Wextra -Werror -Woverloaded-virtual
             -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings
             -Winit-self -Wno-sign-compare -Wno-unused-parameter
             -pthread
@@ -179,7 +179,6 @@ if CTX.PLATFORM == "Linux":
 # one file per line, indented one space, in alphabetical order.
 
 CTX.INPUT['storage'] = """
- hypervisor.cpp
  table.cpp
 """
 
@@ -196,7 +195,7 @@ CTX.INPUT['storage'] = """
 ###############################################################################
 
 CTX.TESTS['storage']="""
-hypertable_test
+table_performance_test
 """
 
 # these are incomplete and out of date. need to be replaced
